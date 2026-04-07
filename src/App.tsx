@@ -103,7 +103,7 @@ function App()
                     <p className="eyebrow">FutureMe</p>
                     <h1>Send a message to your future self</h1>
                     <p className="subtitle">
-                        Write something now, pick a future date, and let your backend deliver it later.
+                        Write a message now, choose when it should arrive, and send it to your future self later.
                     </p>
                 </div>
 
