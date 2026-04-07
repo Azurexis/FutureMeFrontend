@@ -76,7 +76,7 @@ function App()
 
             //Set state and message to success, reset other variables
             setSubmitState("success");
-            setStatusMessage(`Email scheduled for ${scheduledDate.toLocaleString()}.`);
+            setStatusMessage(`Email scheduled for ${scheduledDate.toLocaleString()}. \n Emails will be sent out hourly.`);
             setRecipientEmail("");
             setSubject("");
             setBody("");
