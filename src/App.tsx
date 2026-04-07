@@ -1,121 +1,173 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+//Global variables
+type SubmitState = "idle" | "submitting" | "success" | "error";
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+const API_URL = import.meta.env.VITE_API_URL;
 
-      <div className="ticks"></div>
+//App
+function App()
+{
+    //Variables
+    const [recipientEmail, setRecipientEmail] = useState("");
+    const [subject, setSubject] = useState("");
+    const [body, setBody] = useState("");
+    const [scheduledForLocal, setScheduledForLocal] = useState("");
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+    const [submitState, setSubmitState] = useState<SubmitState>("idle");
+    const [statusMessage, setStatusMessage] = useState("");
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    //Function
+    async function Submit(event: React.SyntheticEvent<HTMLFormElement>)
+    {
+        //Prevent default
+        event.preventDefault();
+
+        //Check if time is valid
+        const scheduledDate = new Date(scheduledForLocal);
+
+        if (Number.isNaN(scheduledDate.getTime()))
+        {
+            setSubmitState("error");
+            setStatusMessage("Please enter a valid date and time.");
+
+            return;
+        }
+
+        if (scheduledDate <= new Date())
+        {
+            setSubmitState("error");
+            setStatusMessage("The scheduled time must be in the future.");
+
+            return;
+        }
+
+        //Set state and message to submitting
+        setSubmitState("submitting");
+        setStatusMessage("");
+
+        //Try
+        try
+        {
+            //Compose response
+            const response = await fetch(API_URL,
+            {
+                method: "POST",
+                headers:
+                {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(
+                {
+                    recipientEmail,
+                    subject,
+                    body,
+                    scheduledForUtc: scheduledDate.toISOString(),
+                }),
+            });
+
+            //Throw error if response is not ok
+            if (!response.ok)
+            {
+                const errorText = await response.text();
+                throw new Error(errorText || "Failed to schedule email.");
+            }
+
+            //Set state and message to success, reset other variables
+            setSubmitState("success");
+            setStatusMessage(`Email scheduled for ${scheduledDate.toLocaleString()}.`);
+            setRecipientEmail("");
+            setSubject("");
+            setBody("");
+            setScheduledForLocal("");
+        }
+
+        //Catch error
+        catch (error)
+        {
+            const message = error instanceof Error
+                ? `Something went wrong. ${error.message}`
+                : "Something went wrong.";
+
+            setSubmitState("error");
+            setStatusMessage(message);
+        }
+    }
+
+    //UI
+    return(
+        <main className="app-shell">
+            <section className="card">
+                <div className="hero">
+                    <p className="eyebrow">FutureMe</p>
+                    <h1>Send a message to your future self</h1>
+                    <p className="subtitle">
+                        Write something now, pick a future date, and let your backend deliver it later.
+                    </p>
+                </div>
+
+                <form className="form" onSubmit={Submit}>
+                    <div className="field-group">
+                        <label htmlFor="recipientEmail">Recipient email</label>
+                        <input
+                            id="recipientEmail"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={recipientEmail}
+                            onChange={(event) => setRecipientEmail(event.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="field-group">
+                        <label htmlFor="subject">Subject</label>
+                        <input
+                            id="subject"
+                            type="text"
+                            placeholder="A message from your past self"
+                            value={subject}
+                            onChange={(event) => setSubject(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="field-group">
+                        <label htmlFor="body">Message</label>
+                        <textarea
+                            id="body"
+                            rows={8}
+                            placeholder="Write something kind, clever, or chaotic for future you..."
+                            value={body}
+                            onChange={(event) => setBody(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="field-group">
+                        <label htmlFor="scheduledFor">Send date and time</label>
+                        <input
+                            id="scheduledFor"
+                            type="datetime-local"
+                            value={scheduledForLocal}
+                            onChange={(event) => setScheduledForLocal(event.target.value)}
+                            required
+                        />
+                        <small>The time you choose will be converted to UTC before sending to the API.</small>
+                    </div>
+
+                    <button className="submit-button" type="submit" disabled={submitState === "submitting"}>
+                        {submitState === "submitting" ? "Scheduling..." : "Schedule email"}
+                    </button>
+                </form>
+
+                {statusMessage && (
+                    <div className={`status-box ${submitState}`}>
+                        {statusMessage}
+                    </div>
+                )}
+            </section>
+        </main>
+    );
 }
 
-export default App
+//Export
+export default App;
