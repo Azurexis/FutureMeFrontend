@@ -151,7 +151,6 @@ function App()
                             onChange={(event) => setScheduledForLocal(event.target.value)}
                             required
                         />
-                        <small>The time you choose will be converted to UTC before sending to the API.</small>
                     </div>
 
                     <button className="submit-button" type="submit" disabled={submitState === "submitting"}>
