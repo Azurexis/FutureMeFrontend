@@ -27,7 +27,7 @@ This project shows how to combine:
 
 ## Architecture
 
-`text
+```text
 React Frontend
     ↓
 HTTP-triggered Azure Function (ScheduleEmail)
@@ -37,7 +37,7 @@ Azure Table Storage (ScheduledEmails)
 Timer-triggered Azure Function (SendScheduledEmails)
     ↓
 Azure Communication Services Email
-`
+```
 
 ## Important note
 
@@ -54,8 +54,8 @@ The frontend is deployed via Azure Static Web Apps.
 
 For deployment, the API URL is provided through GitHub Actions using a GitHub secret such as:
 
-`env:
-  VITE_API_URL: ${{ secrets.VITE_API_URL }}`
+```env:
+  VITE_API_URL: ${{ secrets.VITE_API_URL }}```
 
 The built frontend then calls the backend through Azure API Management.
 
