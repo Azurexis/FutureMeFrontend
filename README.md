@@ -69,12 +69,14 @@ Instead, it sends scheduling requests to the backend API.
 
 Expected request shape:
 
-`{
+```text
+{
   "recipientEmail": "you@example.com",
   "subject": "Hello from the past",
   "body": "This is a message for future me.",
   "scheduledForUtc": "2026-04-08T12:00:00Z"
-}`
+}
+```
 
 ## Purpose
 
