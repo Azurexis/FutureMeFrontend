@@ -54,8 +54,10 @@ The frontend is deployed via Azure Static Web Apps.
 
 For deployment, the API URL is provided through GitHub Actions using a GitHub secret such as:
 
-```env:
-  VITE_API_URL: ${{ secrets.VITE_API_URL }}```
+```text
+env:
+  VITE_API_URL: ${{ secrets.VITE_API_URL }}
+```
 
 The built frontend then calls the backend through Azure API Management.
 
