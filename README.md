@@ -4,6 +4,8 @@ FutureMe is a small full-stack Azure project that lets users schedule an email t
 
 A React frontend submits a scheduling request to an Azure Function API. The backend stores the request in Azure Table Storage, and a timer-triggered Azure Function checks for pending emails and sends them later via Azure Communication Services Email.
 
+![Diagram image](Diagram.png)
+
 ## Why I built this
 
 I wanted to build a realistic Azure portfolio project that is small enough to finish, but still demonstrates real cloud architecture and not just a tutorial-level CRUD app.
